@@ -125,14 +125,51 @@ domega = 2*pi/T;
 n = 1:round(fg/domega);
 f(:,1) = n .* domega; 
 f_deg = f * 180/pi;
-f_deg(end+1) = f_deg(end) + 1;
 
 figure;
-plot(f_deg,P); % Diagramm (f, P(f))
+plot(f_deg,P(2:end)); % Diagramm (f, P(f))
 xlabel('f'); ylabel('P(f)');
 title('Diagramm der Energiedichte');
 
 
 %% Aufgabe 6 - Bestimmung Spektralindex
+
+P0 = P(1);
+P_t = log( P(2:end) );
+f_t = log( f );
+
+Pp = polyfit(f_t,P_t,1);
+
+fprintf("Kappa: %.4f\n", Pp(1))
+fprintf("Kappa0: %.4f\n", Pp(2))
+
+
+
+figure
+loglog(f_t,P_t,'.')
+
+
+
+%% Aufgabe 7 - Kovarianzmatrix des power-law noise
+
+U = eye(I);
+h1 = 1;
+for i = 2:I
+    h = (h1/(i-1)) * (i - (Pp(1)/2) - 2);
+    for j = 1:(I-i+1)
+        U(j,j+i-1) = h;
+    end
+    h1 = h;
+end
+c0 = 1;
+CPL = c0 * U' * U;
+
+
+figure
+imagesc(CPL)
+
+%% Aufgabe 8 - Wiederholung Parameterschätzung
+
+
 
 
