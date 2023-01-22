@@ -170,6 +170,49 @@ imagesc(CPL)
 
 %% Aufgabe 8 - Wiederholung Parameterschätzung
 
+C_PL = CPL;
+A = [ones(I,1) (1:I)'*dt cos(2*pi*(1:I)'*dt/365.25) sin(2*pi*(1:I)'*dt/365.25) cos(2*pi*(1:I)'*dt/(365.25/2)) sin(2*pi*(1:I)'*dt/(365.25/2))];
+x = A\u;
+s0 = std(u-A*x);
+C = eye(I)*s0^2 + C_PL;
+x = A\u;
+x_cov = inv(A'*inv(C)*A)*A'*inv(C)*u;
+x_cov = [x_cov(1:2); x_cov(3:4)*365.25/(2*pi); x_cov(5:6)*365.25/(4*pi)];
 
+disp('Die Werte der geschätzten Parameter und ihre Genauigkeiten sowie die Standardabweichung der Gewichtseinheit sind:')
+disp(x_cov)
+
+C_x = inv(A'*inv(C)*A);
+C_x = C_x./(C_x(1,1)*C_x(2,2)*C_x(3,3)*C_x(4,4)*C_x(5,5)*C_x(6,6))^(1/6);
+
+figure
+imagesc(C_x)
+title('Korrelationsmatrix der geschätzten Parameter')
+xlabel('Zeilenindex')
+ylabel('Spaltenindex')
+colorbar
+
+u_fit = A*x_cov;
+
+figure
+plot(t,u)
+hold on
+plot(t,u_fit,'r-')
+title('Zeitreihe u(t) und Trajektorie des geschätzten Modells')
+xlabel('Zeit, t (d)')
+ylabel('Höhe, u(t) (mm)')
+legend('u(t)','Modell')
+
+
+disp('Vergleich der Parameter unter 3. und 8.:')
+disp('Parameter 3. 8.')
+disp([x x_cov])
+
+
+%Die Parameter des Modells unter 8. sind kleiner als die Parameter unter 
+% 3., da sie die Kovarianzmatrix des power-law noise berücksichtigt. 
+% Die Standardabweichung der Gewichtseinheit ist unter 8. kleiner als 
+% unter 3., da die Kovarianzmatrix des power-law noise die Residuen 
+% besser erklärt.
 
 
